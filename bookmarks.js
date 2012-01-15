@@ -65,8 +65,9 @@ function activateBookmarkFindMode() {
     self.completionDialog = new CompletionDialog({
       source: findBookmarks,
 
-      onSelect: function(selection) {
-        var url = selection.url;
+      onSelect: function(query) {
+        var url = utils.ensureUrl(query);
+
         var isABookmarklet = function(url) { return url.indexOf("javascript:") === 0; }
 
         if (!self.newTab || isABookmarklet(url))
@@ -83,6 +84,10 @@ function activateBookmarkFindMode() {
           displaytext = displaytext.substr(0, 70) + "...";
 
         return displaytext.split(new RegExp(searchString, "i")).join("<strong>"+searchString+"</strong>")
+      },
+
+      selectionToText: function(selection) {
+        return selection.url;
       },
 
       initialSearchText: "Type a bookmark name or URL"
@@ -117,6 +122,11 @@ function activateBookmarkFindMode() {
   }
 
   var findBookmarks = function(queryId, searchString, callback) {
+    if (searchString === "") {
+      callback(queryId, []);
+      return;
+    }
+
     var port = chrome.extension.connect({ name: "getBookmarks" });
     var expectedResponses = 2;
     port.onMessage.addListener(function(msg) {

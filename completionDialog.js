@@ -23,7 +23,7 @@
       if (this.isShown) {
         handlerStack.pop();
         this.isShown = false;
-        this.currentSelection = 0;
+        this.currentSelection = -1;
         clearInterval(this._tweenId);
         var completionContainer = this.container;
         var cssHide = function() { completionContainer.style.display = "none"; }
@@ -43,14 +43,14 @@
   var initialize = function() {
     var self = this;
 
-    self.currentSelection = 0;
+    self.currentSelection = -1;
 
     self.onKeydown = function(event) {
       var keyChar = getKeyChar(event);
       // change selection with up or Shift-Tab
       if (keyChar==="up" || (event.keyCode == 9 && event.shiftKey)) {
-        if (self.currentSelection>0) {
-          self.currentSelection-=1;
+        if (self.currentSelection > -1) {
+          self.currentSelection -= 1;
         }
         render.call(self,self.getQueryString(), self.completions);
       }
@@ -62,10 +62,13 @@
         render.call(self,self.getQueryString(), self.completions);
       }
       else if (event.keyCode == keyCodes.enter) {
-        self.options.onSelect(self.completions[self.currentSelection]);
+        self.options.onSelect(self.selectedString);
       }
       else if (event.keyCode == keyCodes.backspace || event.keyCode == keyCodes.deleteKey) {
         if (self.query.length > 0) {
+          // we assume that the user wants to edit the text of a selection, so the selection's string will
+          // replace the original search string
+          self.query = self.selectedString.split("");
           self.mostRecentQueryId = Math.random();
           self.completions = [];
           self.query.pop();
@@ -97,7 +100,7 @@
 
   var render = function(searchString, completions) {
     if (this.isShown) {
-      this.searchString = searchString;
+      this.selectedString = searchString;
       this.completions = completions;
       var container = this.getDisplayElement();
       clearChildren(container);
@@ -125,10 +128,13 @@
             var resultDiv = createDivInside(searchResults);
             if (i === this.currentSelection) {
               resultDiv.className="vimiumReset vimium-selected";
+              this.selectedString = this.options.selectionToText(completions[i]);
             }
             resultDiv.innerHTML=this.options.renderOption(searchString, completions[i]);
           }
         }
+
+        searchBar.innerHTML = this.selectedString;
       }
 
       container.style.top = Math.max(0, (window.innerHeight/2-container.clientHeight/2)) + "px";
