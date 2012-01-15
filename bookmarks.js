@@ -116,13 +116,15 @@ function activateBookmarkFindMode() {
     };
   }
 
-  var findBookmarks = function(searchString, callback) {
-    var port = chrome.extension.connect({ name: "getBookmarks" }) ;
+  var findBookmarks = function(queryId, searchString, callback) {
+    var port = chrome.extension.connect({ name: "getBookmarks" });
+    var expectedResponses = 2;
     port.onMessage.addListener(function(msg) {
-      callback(msg.bookmarks);
-      port = null;
+      callback(msg.queryId, msg.records);
+      if (--expectedResponses == 0)
+        port = null;
     })
-    port.postMessage({query:searchString});
+    port.postMessage({query:searchString, queryId: queryId});
   };
 
   window.BookmarkMode = BookmarkMode;

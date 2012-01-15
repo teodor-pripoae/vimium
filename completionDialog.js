@@ -66,16 +66,26 @@
       }
       else if (event.keyCode == keyCodes.backspace || event.keyCode == keyCodes.deleteKey) {
         if (self.query.length > 0) {
+          self.mostRecentQueryId = Math.random();
+          self.completions = [];
           self.query.pop();
-          self.options.source(self.getQueryString(), function(completions) {
-            render.call(self, self.getQueryString(), completions);
+          self.options.source(self.mostRecentQueryId, self.getQueryString(), function(queryId, completions) {
+            if (queryId == self.mostRecentQueryId) {
+              Array.prototype.push.apply(self.completions, completions);
+              render.call(self, self.getQueryString(), self.completions);
+            }
           })
         }
       }
       else if (keyChar!=="left" && keyChar!="right") {
+        self.mostRecentQueryId = Math.random();
+        self.completions = [];
         self.query.push(keyChar);
-        self.options.source(self.getQueryString(), function(completions) {
-          render.call(self, self.getQueryString(), completions);
+        self.options.source(self.mostRecentQueryId, self.getQueryString(), function(queryId, completions) {
+          if (queryId == self.mostRecentQueryId) {
+            Array.prototype.push.apply(self.completions, completions);
+            render.call(self, self.getQueryString(), self.completions);
+          }
         });
       }
 

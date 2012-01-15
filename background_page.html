@@ -265,8 +265,21 @@
 
   function getBookmarks(args, port) {
     chrome.bookmarks.search(args.query, function(bookmarks) {
-        port.postMessage({bookmarks:bookmarks})
-    })
+      port.postMessage({records:bookmarks, queryId: args.queryId})
+    });
+
+    // send the top 5 most visited history entries.
+    // XXX(jez): this may not be the fastest way to do it. worth checking if a selection algorithm in JS could
+    // be faster than the built-in sort.
+    chrome.history.search({ text: args.query }, function(history) {
+      history.sort(function(a, b) {
+        // visitCount may be undefined
+        var visitCountForA = a.visitCount || 0;
+        var visitCountForB = b.visitCount || 0;
+        return visitCountForB - visitCountForA;
+      });
+      port.postMessage({records:history.slice(0,5), queryId: args.queryId})
+    });
   }
 
   function getCurrentTimeInSeconds() { Math.floor((new Date()).getTime() / 1000); }

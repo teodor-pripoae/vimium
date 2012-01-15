@@ -11,6 +11,7 @@
     "tabs",
     "bookmarks",
     "clipboardRead",
+    "history",
     "http://*/*",
     "https://*/*"
   ],
