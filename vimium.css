@@ -248,10 +248,16 @@ div.vimium-completions .vimium-searchBar {
   display: block;
   height: 15px;
   border-bottom: 1px solid #b3b3b3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 div.vimium-completions div.vimium-searchResults div {
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 div.vimium-completions div.vimium-searchResults div.vimium-selected{

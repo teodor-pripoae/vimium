@@ -87,9 +87,6 @@ function activateBookmarkFindMode() {
         var displaytext = selection.title + " (" + selection.url + ")"
         if (selection.type === "tab")
           displaytext = "[Switch] " + displaytext;
-        if (displaytext.length > 70)
-          displaytext = displaytext.substr(0, 70) + "...";
-
         return displaytext.split(new RegExp(searchString, "i")).join("<strong>"+searchString+"</strong>")
       },
 
