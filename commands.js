@@ -142,7 +142,9 @@ function clearKeyMappingsAndSetDefaults() {
     "X": "restoreTab",
 
     "o": "activateOmniMode",
+    "O": "activateOmniModeWithCurrentUrl",
     "t": "activateOmniModeToOpenInNewTab",
+    "T": "activateOmniModeToOpenInNewTabWithCurrentUrl",
 
     "gf": "nextFrame"
   };
@@ -209,7 +211,9 @@ var commandDescriptions = {
   restoreTab: ["Restore closed tab", { background: true }],
 
   activateOmniMode: ["Open a URL in the current tab"],
+  activateOmniModeWithCurrentUrl: ["Open a URL in the current tab"],
   activateOmniModeToOpenInNewTab: ["Open a URL in a new tab"],
+  activateOmniModeToOpenInNewTabWithCurrentUrl: ["Open a URL in a new tab"],
 
   nextFrame: ["Cycle forward to the next frame on the page", { background: true, passCountToFunction: true }]
 };
@@ -229,7 +233,8 @@ var commandGroups = {
      "openCopiedUrlInCurrentTab", "openCopiedUrlInNewTab", "goUp",
      "enterInsertMode", "focusInput",
      "linkHints.activateMode", "linkHints.activateModeToOpenInNewTab", "linkHints.activateModeWithQueue",
-     "activateOmniMode", "activateOmniModeToOpenInNewTab",
+     "activateOmniMode", "activateOmniModeWithCurrentUrl",
+     "activateOmniModeToOpenInNewTab", "activateOmniModeToOpenInNewTabWithCurrentUrl",
      "goPrevious", "goNext", "nextFrame"],
   findCommands: ["enterFindMode", "performFind", "performBackwardsFind"],
   historyNavigation:

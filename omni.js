@@ -3,9 +3,19 @@ function activateOmniModeToOpenInNewTab() {
   OmniMode.enable();
 }
 
+function activateOmniModeToOpenInNewTabWithCurrentUrl() {
+  OmniMode.openInNewTab(true);
+  OmniMode.enable(window.location.href);
+}
+
 function activateOmniMode() {
   OmniMode.openInNewTab(false);
   OmniMode.enable();
+}
+
+function activateOmniModeWithCurrentUrl() {
+  OmniMode.openInNewTab(false);
+  OmniMode.enable(window.location.href);
 }
 
 (function() {
@@ -26,7 +36,7 @@ function activateOmniMode() {
         this.renderHUD();
       }
     },
-    enable: function() {
+    enable: function(initialQueryString) {
       this.enabled = true;
 
       if(!this.initialized) {
@@ -40,7 +50,7 @@ function activateOmniMode() {
       });
 
       this.renderHUD();
-      this.completionDialog.show();
+      this.completionDialog.show(initialQueryString);
     },
     disable: function() {
       this.enabled = false;

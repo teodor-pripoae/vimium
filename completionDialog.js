@@ -3,19 +3,28 @@
   var CompletionDialog = function(options) { this.options = options; }
 
   CompletionDialog.prototype = {
-    show: function() {
+    show: function(initialQueryString) {
       if (!this.isShown) {
         this.isShown=true;
-        this.query = [];
+        this.query = initialQueryString === undefined ? [] : initialQueryString.split("");
         if (!this.initialized) {
           initialize.call(this);
           this.initialized = true;
         }
         handlerStack.push({ keydown: this.onKeydown });
-        render.call(this);
+
+        // we need to call render() and renderCompletions() later because the latter is asynchronous, and we
+        // need this.container to be initialized before applying the tweening to it.
+        if (initialQueryString === undefined)
+          render.call(this);
+        else
+          render.call(this, "", []);
         clearInterval(this._tweenId);
         this.container.style.display = "block";
         this._tweenId = Tween.fade(this.container, 1.0, 150);
+
+        if (initialQueryString !== undefined)
+          renderCompletions.call(this);
       }
     },
 
@@ -72,27 +81,13 @@
           // we assume that the user wants to edit the text of a selection, so the selection's string will
           // replace the original search string
           self.query = self.selectedString.split("");
-          self.mostRecentQueryId = Math.random();
-          self.completions = [];
           self.query.pop();
-          self.options.source(self.mostRecentQueryId, self.getQueryString(), function(queryId, completions) {
-            if (queryId == self.mostRecentQueryId) {
-              Array.prototype.push.apply(self.completions, completions);
-              render.call(self, self.getQueryString(), self.completions);
-            }
-          })
+          renderCompletions.call(self);
         }
       }
       else if (keyChar!=="left" && keyChar!="right") {
-        self.mostRecentQueryId = Math.random();
-        self.completions = [];
         self.query.push(keyChar);
-        self.options.source(self.mostRecentQueryId, self.getQueryString(), function(queryId, completions) {
-          if (queryId == self.mostRecentQueryId) {
-            Array.prototype.push.apply(self.completions, completions);
-            render.call(self, self.getQueryString(), self.completions);
-          }
-        });
+        renderCompletions.call(self);
       }
 
       event.stopPropagation();
@@ -100,6 +95,18 @@
       return true;
     }
   }
+
+  var renderCompletions = function() {
+    var self = this;
+    self.mostRecentQueryId = Math.random();
+    self.completions = [];
+    self.options.source(self.mostRecentQueryId, self.getQueryString(), function(queryId, completions) {
+      if (queryId == self.mostRecentQueryId) {
+        Array.prototype.push.apply(self.completions, completions);
+        render.call(self, self.getQueryString(), self.completions);
+      }
+    });
+  };
 
   var render = function(searchString, completions) {
     if (this.isShown) {
