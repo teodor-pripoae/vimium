@@ -62,7 +62,10 @@
         render.call(self,self.getQueryString(), self.completions);
       }
       else if (event.keyCode == keyCodes.enter) {
-        self.options.onSelect(self.selectedString);
+        if (self.currentSelection == -1)
+          self.options.onSelect({url:self.selectedString, type:'rawString'});
+        else
+          self.options.onSelect(self.completions[self.currentSelection]);
       }
       else if (event.keyCode == keyCodes.backspace || event.keyCode == keyCodes.deleteKey) {
         if (self.query.length > 0) {

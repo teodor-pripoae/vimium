@@ -36,6 +36,7 @@
     openUrlInNewTab: openUrlInNewTab,
     openUrlInCurrentTab: openUrlInCurrentTab,
     openOptionsPageInNewTab: openOptionsPageInNewTab,
+    selectTabById: selectTabById,
     registerFrame: registerFrame,
     frameFocused: handleFrameFocused,
     focusTopFrame: focusTopFrame,
@@ -265,7 +266,7 @@
 
   function getBookmarks(args, port) {
     chrome.bookmarks.search(args.query, function(bookmarks) {
-      port.postMessage({records:bookmarks, queryId: args.queryId})
+      port.postMessage({records:bookmarks, recordType: "bookmark", queryId: args.queryId})
     });
 
     // send the top 5 most visited history entries.
@@ -278,7 +279,16 @@
         var visitCountForB = b.visitCount || 0;
         return visitCountForB - visitCountForA;
       });
-      port.postMessage({records:history.slice(0,5), queryId: args.queryId})
+      port.postMessage({records:history.slice(0,5), recordType: "history", queryId: args.queryId})
+    });
+
+
+    chrome.tabs.getAllInWindow(null, function(tabs) {
+      var matchedTabs = tabs.filter(function(tab) {
+        var tabString = tab.url + tab.title;
+        return tabString.toLowerCase().indexOf(args.query.toLowerCase()) !== -1 && tab.id != port.tab.id;
+      });
+      port.postMessage({records:matchedTabs, recordType: "tab", queryId: args.queryId});
     });
   }
 
@@ -341,6 +351,10 @@
           chrome.tabs.update(toSelect.id, { selected: true });
       });
     });
+  }
+
+  function selectTabById(request) {
+    chrome.tabs.update(request.tabId, { active: true });
   }
 
   function removeTab(callback) {

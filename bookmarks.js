@@ -65,21 +65,28 @@ function activateBookmarkFindMode() {
     self.completionDialog = new CompletionDialog({
       source: findBookmarks,
 
-      onSelect: function(query) {
-        var url = utils.ensureUrl(query);
+      onSelect: function(selection) {
+        if (selection.type === "tab") {
+          chrome.extension.sendRequest({handler:"selectTabById", tabId:selection.id});
+        }
+        else {
+          var url = utils.ensureUrl(selection.url);
 
-        var isABookmarklet = function(url) { return url.indexOf("javascript:") === 0; }
+          var isABookmarklet = function(url) { return url.indexOf("javascript:") === 0; }
 
-        if (!self.newTab || isABookmarklet(url))
-          window.location = url;
-        else
-          window.open(url);
+          if (!self.newTab || isABookmarklet(url))
+            window.location = url;
+          else
+            window.open(url);
+        }
 
         self.disable();
       },
 
       renderOption: function(searchString, selection) {
         var displaytext = selection.title + " (" + selection.url + ")"
+        if (selection.type === "tab")
+          displaytext = "[Switch] " + displaytext;
         if (displaytext.length > 70)
           displaytext = displaytext.substr(0, 70) + "...";
 
@@ -128,8 +135,10 @@ function activateBookmarkFindMode() {
     }
 
     var port = chrome.extension.connect({ name: "getBookmarks" });
-    var expectedResponses = 2;
+    var expectedResponses = 3;
     port.onMessage.addListener(function(msg) {
+      for (var i in msg.records)
+        msg.records[i].type = msg.recordType;
       callback(msg.queryId, msg.records);
       if (--expectedResponses == 0)
         port = null;
