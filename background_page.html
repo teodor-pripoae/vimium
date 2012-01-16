@@ -27,7 +27,7 @@
     returnScrollPosition: handleReturnScrollPosition,
     getCurrentTabUrl:     getCurrentTabUrl,
     settings:             handleSettings,
-    getBookmarks:         getBookmarks
+    getOmniQueryCompletions: getOmniQueryCompletions,
   };
 
   var sendRequestHandlers = {
@@ -264,7 +264,7 @@
     }
   }
 
-  function getBookmarks(args, port) {
+  function getOmniQueryCompletions(args, port) {
     chrome.bookmarks.search(args.query, function(bookmarks) {
       port.postMessage({records:bookmarks, recordType: "bookmark", queryId: args.queryId})
     });

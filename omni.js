@@ -1,11 +1,11 @@
-function activateBookmarkFindModeToOpenInNewTab() {
-  BookmarkMode.openInNewTab(true);
-  BookmarkMode.enable();
+function activateOmniModeToOpenInNewTab() {
+  OmniMode.openInNewTab(true);
+  OmniMode.enable();
 }
 
-function activateBookmarkFindMode() {
-  BookmarkMode.openInNewTab(false);
-  BookmarkMode.enable();
+function activateOmniMode() {
+  OmniMode.openInNewTab(false);
+  OmniMode.enable();
 }
 
 (function() {
@@ -13,7 +13,7 @@ function activateBookmarkFindMode() {
   // untoggle it
   var shiftWasPressedWhileToggled = false;
 
-  var BookmarkMode = {
+  var OmniMode = {
     isEnabled: function() {
       return this.enabled;
     },
@@ -50,9 +50,9 @@ function activateBookmarkFindMode() {
     },
     renderHUD: function() {
       if (this.newTab)
-        HUD.show("Open bookmark in new tab");
+        HUD.show("Open a URL in new tab");
       else
-        HUD.show("Open bookmark in current tab");
+        HUD.show("Open a URL in current tab");
     }
 
   }
@@ -63,7 +63,7 @@ function activateBookmarkFindMode() {
     self.initialized = true;
 
     self.completionDialog = new CompletionDialog({
-      source: findBookmarks,
+      source: findOmniQueryCompletions,
 
       onSelect: function(selection) {
         if (selection.type === "tab") {
@@ -94,7 +94,7 @@ function activateBookmarkFindMode() {
         return selection.url;
       },
 
-      initialSearchText: "Type a bookmark name or URL"
+      initialSearchText: "Type a search string or URL"
     })
 
     self.onKeydown = function(event) {
@@ -125,13 +125,13 @@ function activateBookmarkFindMode() {
     };
   }
 
-  var findBookmarks = function(queryId, searchString, callback) {
+  var findOmniQueryCompletions = function(queryId, searchString, callback) {
     if (searchString === "") {
       callback(queryId, []);
       return;
     }
 
-    var port = chrome.extension.connect({ name: "getBookmarks" });
+    var port = chrome.extension.connect({ name: "getOmniQueryCompletions" });
     var expectedResponses = 3;
     port.onMessage.addListener(function(msg) {
       for (var i in msg.records)
@@ -143,5 +143,5 @@ function activateBookmarkFindMode() {
     port.postMessage({query:searchString, queryId: queryId});
   };
 
-  window.BookmarkMode = BookmarkMode;
+  window.OmniMode = OmniMode;
 }())

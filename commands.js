@@ -141,8 +141,8 @@ function clearKeyMappingsAndSetDefaults() {
     "x": "removeTab",
     "X": "restoreTab",
 
-    "b": "activateBookmarkFindMode",
-    "B": "activateBookmarkFindModeToOpenInNewTab",
+    "o": "activateOmniMode",
+    "t": "activateOmniModeToOpenInNewTab",
 
     "gf": "nextFrame"
   };
@@ -208,8 +208,8 @@ var commandDescriptions = {
   removeTab: ["Close current tab", { background: true }],
   restoreTab: ["Restore closed tab", { background: true }],
 
-  activateBookmarkFindMode: ["Open a bookmark in the current tab"],
-  activateBookmarkFindModeToOpenInNewTab: ["Open a bookmark in a new tab"],
+  activateOmniMode: ["Open a URL in the current tab"],
+  activateOmniModeToOpenInNewTab: ["Open a URL in a new tab"],
 
   nextFrame: ["Cycle forward to the next frame on the page", { background: true, passCountToFunction: true }]
 };
@@ -229,7 +229,7 @@ var commandGroups = {
      "openCopiedUrlInCurrentTab", "openCopiedUrlInNewTab", "goUp",
      "enterInsertMode", "focusInput",
      "linkHints.activateMode", "linkHints.activateModeToOpenInNewTab", "linkHints.activateModeWithQueue",
-     "activateBookmarkFindMode", "activateBookmarkFindModeToOpenInNewTab",
+     "activateOmniMode", "activateOmniModeToOpenInNewTab",
      "goPrevious", "goNext", "nextFrame"],
   findCommands: ["enterFindMode", "performFind", "performBackwardsFind"],
   historyNavigation:

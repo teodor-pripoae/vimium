@@ -228,7 +228,7 @@ div.vimiumHUD a.close-button:hover {
   -webkit-user-select:none; 
 }
 
-/* Bookmarks completion dialog CSS */
+/* Completion dialog CSS */
 
 div.vimium-dialog {
   background-color: #ebebeb; 
