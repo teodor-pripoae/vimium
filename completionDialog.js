@@ -80,13 +80,18 @@
         if (self.query.length > 0) {
           // we assume that the user wants to edit the text of a selection, so the selection's string will
           // replace the original search string
-          self.query = self.selectedString.split("");
+          if (self.selectedString && self.query != self.selectedString)
+            self.query = self.selectedString.split("");
           self.query.pop();
+          self.currentSelection = -1;
           renderCompletions.call(self);
         }
       }
-      else if (keyChar!=="left" && keyChar!="right") {
+      else if (keyChar && keyChar!=="left" && keyChar!="right") {
+        if (self.selectedString && self.query != self.selectedString)
+          self.query = self.selectedString.split("");
         self.query.push(keyChar);
+        self.currentSelection = -1;
         renderCompletions.call(self);
       }
 
