@@ -108,6 +108,7 @@
     self.options.source(self.mostRecentQueryId, self.getQueryString(), function(queryId, completions) {
       if (queryId == self.mostRecentQueryId) {
         Array.prototype.push.apply(self.completions, completions);
+        self.completions.sort(function(a, b) { return a.priority - b.priority; });
         render.call(self, self.getQueryString(), self.completions);
       }
     });

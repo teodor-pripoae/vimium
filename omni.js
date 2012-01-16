@@ -149,6 +149,13 @@ function activateOmniModeWithCurrentUrl() {
     };
   }
 
+  var recordPriorities = {
+    bookmark: 3,
+    history: 3,
+    tab: 2,
+    searchCompletion: 1,
+  };
+
   var findOmniQueryCompletions = function(queryId, searchString, callback) {
     if (searchString === "") {
       callback(queryId, []);
@@ -158,13 +165,17 @@ function activateOmniModeWithCurrentUrl() {
     var port = chrome.extension.connect({ name: "getOmniQueryCompletions" });
     var expectedResponses = 3;
     port.onMessage.addListener(function(msg) {
-      for (var i in msg.records)
+      for (var i in msg.records) {
         msg.records[i].type = msg.recordType;
+        // right now we assign every message of one type the same priority -- but we could extend this system
+        // in the future to give more useful rankings
+        msg.records[i].priority = recordPriorities[msg.recordType];
+      }
       callback(msg.queryId, msg.records);
       if (--expectedResponses == 0)
         port = null;
     })
-    port.postMessage({query:searchString, queryId: queryId});
+    port.postMessage({query: searchString, queryId: queryId});
     findGoogleSearchCompletions(queryId, searchString, callback);
   };
 
@@ -173,7 +184,7 @@ function activateOmniModeWithCurrentUrl() {
     utils.makeAjaxRequest("GET", googleQuery, function(results) {
       var parsedResults = JSON.parse(results);
       var records = parsedResults[1].slice(0,5).map(function(result) {
-        return { type: "searchCompletion", text: result };
+        return { type: "searchCompletion", text: result, priority: recordPriorities["searchCompletion"] };
       });
       callback(queryId, records);
     });
