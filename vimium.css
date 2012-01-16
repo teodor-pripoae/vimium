@@ -231,17 +231,23 @@ div.vimiumHUD a.close-button:hover {
 /* Completion dialog CSS */
 
 div.vimium-dialog {
-  background-color: #ebebeb; 
+  opacity:0.92;
+  background-color:#eee;
   display: block;
   position:fixed;
-  z-index: 99999998; 
-  border: 1px solid #b3b3b3; 
+  border:2px solid #b3b3b3;
   padding:10px;
-  border-radius: 4px; 
+  border-radius:6px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 6px;
+  z-index: 99999998;
 }
 
 div.vimium-completions {
-  width:400px;
+  width:80%;
+}
+
+div.vimium-completions span.vimium-completionTitle {
+  color:#2f508e;
 }
 
 div.vimium-completions .vimium-searchBar {
@@ -255,13 +261,19 @@ div.vimium-completions .vimium-searchBar {
 
 div.vimium-completions div.vimium-searchResults div {
   display: block;
+  width: 100%;
+}
+
+div.vimium-completions div.vimium-searchResults div span {
+  display: inline-block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 50%;
 }
 
 div.vimium-completions div.vimium-searchResults div.vimium-selected{
-  background-color:#aaa;
+  background-color:#ccc;
   border-radius: 4px; 
 }
 

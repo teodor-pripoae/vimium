@@ -94,10 +94,10 @@ function activateOmniModeWithCurrentUrl() {
       },
 
       renderOption: function(searchString, selection) {
-        var displaytext = selection.title + " (" + selection.url + ")"
-        if (selection.type === "tab")
-          displaytext = "[Switch] " + displaytext;
-        return displaytext.split(new RegExp(searchString, "i")).join("<strong>"+searchString+"</strong>")
+        var displayTitle = (selection.type === "tab" ? "[Switch] " : "") + selection.title;
+        var displayText = "<span class='vimiumReset vimium-completionTitle'>" + displayTitle + "</span>" +
+          "<span class='vimiumReset vimium-completionUrl'>" + selection.url + "</span>";
+        return displayText.split(new RegExp(searchString, "i")).join("<strong>"+searchString+"</strong>")
       },
 
       selectionToText: function(selection) {
