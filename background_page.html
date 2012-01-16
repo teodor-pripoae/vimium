@@ -266,7 +266,7 @@
 
   function getOmniQueryCompletions(args, port) {
     chrome.bookmarks.search(args.query, function(bookmarks) {
-      port.postMessage({records:bookmarks, recordType: "bookmark", queryId: args.queryId})
+      port.postMessage({records:bookmarks.slice(0,5), recordType: "bookmark", queryId: args.queryId})
     });
 
     // send the top 5 most visited history entries.
@@ -288,7 +288,7 @@
         var tabString = tab.url + tab.title;
         return tabString.toLowerCase().indexOf(args.query.toLowerCase()) !== -1 && tab.id != port.tab.id;
       });
-      port.postMessage({records:matchedTabs, recordType: "tab", queryId: args.queryId});
+      port.postMessage({records:matchedTabs.slice(0,3), recordType: "tab", queryId: args.queryId});
     });
   }
 

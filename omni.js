@@ -183,7 +183,7 @@ function activateOmniModeWithCurrentUrl() {
     var googleQuery = "http://suggestqueries.google.com/complete/search?client=firefox&q=" + searchString;
     utils.makeAjaxRequest("GET", googleQuery, function(results) {
       var parsedResults = JSON.parse(results);
-      var records = parsedResults[1].slice(0,5).map(function(result) {
+      var records = parsedResults[1].slice(0,3).map(function(result) {
         return { type: "searchCompletion", text: result, priority: recordPriorities["searchCompletion"] };
       });
       callback(queryId, records);
