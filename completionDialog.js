@@ -58,16 +58,18 @@
       var keyChar = getKeyChar(event);
       // change selection with up or Shift-Tab
       if (keyChar==="up" || (event.keyCode == 9 && event.shiftKey)) {
-        if (self.currentSelection > -1) {
+        if (self.currentSelection > -1)
           self.currentSelection -= 1;
-        }
+        else
+          self.currentSelection = self.completions.length - 1;
         render.call(self,self.getQueryString(), self.completions);
       }
       // change selection with down or Tab
       else if (keyChar==="down" || (event.keyCode == 9 && !event.shiftKey)) {
-        if (self.currentSelection < self.completions.length - 1) {
+        if (self.currentSelection < self.completions.length - 1)
           self.currentSelection += 1;
-        }
+        else
+          self.currentSelection = -1;
         render.call(self,self.getQueryString(), self.completions);
       }
       else if (event.keyCode == keyCodes.enter) {
