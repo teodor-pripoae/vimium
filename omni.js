@@ -80,28 +80,42 @@ function activateOmniModeWithCurrentUrl() {
           chrome.extension.sendRequest({handler:"selectTabById", tabId:selection.id});
         }
         else {
-          var url = utils.ensureUrl(selection.url);
+          var openInNewTab = self.newTab;
+          if (selection.type === "searchCompletion")
+            var url = utils.createSearchUrl(selection.text);
+          else {
+            var url = utils.ensureUrl(selection.url);
+            // if it is a bookmarklet, do not open in a new tab
+            openInNewTab &= !(url.indexOf("javascript:") === 0);
+          }
 
-          var isABookmarklet = function(url) { return url.indexOf("javascript:") === 0; }
-
-          if (!self.newTab || isABookmarklet(url))
-            window.location = url;
-          else
+          if (openInNewTab)
             window.open(url);
+          else
+            window.location = url;
         }
 
         self.disable();
       },
 
       renderOption: function(searchString, selection) {
-        var displayTitle = (selection.type === "tab" ? "[Switch] " : "") + selection.title;
-        var displayText = "<span class='vimiumReset vimium-completionTitle'>" + displayTitle + "</span>" +
-          "<span class='vimiumReset vimium-completionUrl'>" + selection.url + "</span>";
+        if (selection.type === "searchCompletion") {
+          var displayText = "<span class='vimiumReset vimium-completionTitle'>[Search] " +
+            selection.text + "</span>";
+        }
+        else {
+          var displayTitle = (selection.type === "tab" ? "[Switch] " : "") + selection.title;
+          var displayText = "<span class='vimiumReset vimium-completionTitle'>" + displayTitle + "</span>" +
+            "<span class='vimiumReset vimium-completionUrl'>" + selection.url + "</span>";
+        }
         return displayText.split(new RegExp(searchString, "i")).join("<strong>"+searchString+"</strong>")
       },
 
       selectionToText: function(selection) {
-        return selection.url;
+        if (selection.type === "searchCompletion")
+          return selection.text;
+        else
+          return selection.url;
       },
 
       initialSearchText: "Type a search string or URL"
@@ -151,7 +165,19 @@ function activateOmniModeWithCurrentUrl() {
         port = null;
     })
     port.postMessage({query:searchString, queryId: queryId});
+    findGoogleSearchCompletions(queryId, searchString, callback);
   };
+
+  var findGoogleSearchCompletions = utils.debounce(function(queryId, searchString, callback) {
+    var googleQuery = "http://suggestqueries.google.com/complete/search?client=firefox&q=" + searchString;
+    utils.makeAjaxRequest("GET", googleQuery, function(results) {
+      var parsedResults = JSON.parse(results);
+      var records = parsedResults[1].slice(0,5).map(function(result) {
+        return { type: "searchCompletion", text: result };
+      });
+      callback(queryId, records);
+    });
+  }, 200);
 
   window.OmniMode = OmniMode;
 }())
