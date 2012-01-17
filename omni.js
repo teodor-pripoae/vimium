@@ -99,16 +99,21 @@ function activateOmniModeWithCurrentUrl() {
       },
 
       renderOption: function(searchString, selection) {
+        // must be called on plain text, not markup!
+        function strongHighlight(str) {
+          return str.split(new RegExp(searchString, "i")).join("<strong>"+searchString+"</strong>");
+        }
         if (selection.type === "searchCompletion") {
           var displayText = "<span class='vimiumReset vimium-completionTitle'>[Search] " +
-            selection.text + "</span>";
+            strongHighlight(selection.text) + "</span>";
         }
         else {
           var displayTitle = (selection.type === "tab" ? "[Switch] " : "") + selection.title;
-          var displayText = "<span class='vimiumReset vimium-completionTitle'>" + displayTitle + "</span>" +
-            "<span class='vimiumReset vimium-completionUrl'>" + selection.url + "</span>";
+          var displayText = "<span class='vimiumReset vimium-completionTitle'>" +
+            strongHighlight(displayTitle) + "</span>" +
+            "<span class='vimiumReset vimium-completionUrl'>" +strongHighlight(selection.url) + "</span>";
         }
-        return displayText.split(new RegExp(searchString, "i")).join("<strong>"+searchString+"</strong>")
+        return displayText;
       },
 
       selectionToText: function(selection) {
