@@ -46,7 +46,7 @@ var settings = {
   values: {},
   loadedValues: 0,
   valuesToLoad: ["scrollStepSize", "linkHintCharacters", "filterLinkHints", "previousPatterns", "nextPatterns",
-                 "findQuery"],
+                 "findModeRawQuery"],
 
   init: function () {
     this.port = chrome.extension.connect({ name: "settings" });
@@ -684,6 +684,7 @@ function handleDeleteForFindMode() {
 
 function handleEnterForFindMode() {
   exitFindMode();
+  settings.set("findModeRawQuery", findModeQuery.rawQuery);
   performFindInPlace();
 }
 
@@ -728,6 +729,15 @@ function focusFoundLink() {
 }
 
 function findAndFocus(backwards) {
+  // check if the query has been changed by a script in another frame
+  var mostRecentQuery = settings.get("findModeRawQuery");
+  if (mostRecentQuery !== findModeQuery.rawQuery) {
+    findModeQuery.rawQuery = mostRecentQuery;
+    updateFindModeQuery();
+    performFindInPlace();
+    return;
+  }
+
   if (!findModeQueryHasResults)
     return;
 
