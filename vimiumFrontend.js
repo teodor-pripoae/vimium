@@ -35,7 +35,7 @@ var textInputXPath = (function() {
   var inputElements = ["input[" +
     textInputTypes.map(function (type) { return '@type="' + type + '"'; }).join(" or ") + "or not(@type)]",
     "textarea", "*[@contenteditable='' or translate(@contenteditable, 'TRUE', 'true')='true']"];
-  return utils.makeXPath(inputElements);
+  return domUtils.makeXPath(inputElements);
 })();
 
 /**
@@ -255,7 +255,7 @@ function scrollActivatedElementBy(x, y) {
     return;
   }
 
-  if (!activatedElement || utils.getVisibleClientRect(activatedElement) === null)
+  if (!activatedElement || domUtils.getVisibleClientRect(activatedElement) === null)
     activatedElement = document.body;
 
   // Chrome does not report scrollHeight accurately for nodes with pseudo-elements of height 0 (bug 110149).
@@ -305,7 +305,7 @@ function scrollLeft() { scrollActivatedElementBy(-1 * settings.get("scrollStepSi
 function scrollRight() { scrollActivatedElementBy(settings.get("scrollStepSize"), 0); }
 
 function focusInput(count) {
-  var results = utils.evaluateXPath(textInputXPath, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
+  var results = domUtils.evaluateXPath(textInputXPath, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
 
   var lastInputBox;
   var i = 0;
@@ -314,7 +314,7 @@ function focusInput(count) {
     var currentInputBox = results.iterateNext();
     if (!currentInputBox) { break; }
 
-    if (utils.getVisibleClientRect(currentInputBox) === null)
+    if (domUtils.getVisibleClientRect(currentInputBox) === null)
         continue;
 
     lastInputBox = currentInputBox;
@@ -767,9 +767,9 @@ function selectFoundInputElement() {
   // instead. however, since the last focused element might not be the one currently pointed to by find (e.g.
   // the current one might be disabled and therefore unable to receive focus), we use the approximate
   // heuristic of checking that the last anchor node is an ancestor of our element.
-  if (findModeQueryHasResults && linkHints.isSelectable(document.activeElement) &&
+  if (findModeQueryHasResults && domUtils.isSelectable(document.activeElement) &&
       isDOMDescendant(findModeLastAnchorNode, document.activeElement)) {
-    linkHints.simulateSelect(document.activeElement);
+    domUtils.simulateSelect(document.activeElement);
     // the element has already received focus via find(), so invoke insert mode manually
     enterInsertModeWithoutShowingIndicator(document.activeElement);
   }
@@ -813,7 +813,7 @@ function findAndFocus(backwards) {
       keydown: function(event) {
         handlerStack.pop();
         if (isEscape(event)) {
-          linkHints.simulateSelect(document.activeElement);
+          domUtils.simulateSelect(document.activeElement);
           enterInsertModeWithoutShowingIndicator(document.activeElement);
           return false; // we have 'consumed' this event, so do not propagate
         }
