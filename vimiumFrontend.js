@@ -838,17 +838,46 @@ function getLinkFromSelection() {
   return null;
 }
 
+/**
+ * Find and follow the shortest link (shortest == fewest words) which matches any one of a list of strings.
+ * If there are multiple shortest links, strings at the start of the search list get priority.
+ * Practically speaking, this means we favor 'next page' over 'the next big thing'.
+ */
 function findAndFollowLink(linkStrings) {
-  for (i = 0; i < linkStrings.length; i++) {
-    var hasResults = window.find(linkStrings[i], false, true, true, false, true, false);
-    if (hasResults) {
-      var link = getLinkFromSelection();
-      if (link) {
-        domUtils.simulateClick(link);
+  var linksXPath = domUtils.makeXPath(["a", "*[@onclick or @role='link']"]);
+  var links = domUtils.evaluateXPath(linksXPath, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
+  var shortestLinks = [];
+  var shortestLinkLength = null;
+
+  for (var i = 0, count = links.snapshotLength; i < count; i++) {
+    var link = links.snapshotItem(i);
+    var linkMatches = false;
+    for (var j = 0; j < linkStrings.length; j++) {
+      if (link.innerText.toLowerCase().indexOf(linkStrings[j]) !== -1) {
+        linkMatches = true;
+        break;
+      }
+    }
+    if (!linkMatches) continue;
+
+    var wordCount = link.innerText.trim().split(/\s+/).length;
+    if (shortestLinkLength === null || wordCount < shortestLinkLength) {
+      shortestLinkLength = wordCount;
+      shortestLinks = [ link ];
+    }
+    else if (wordCount === shortestLinkLength) {
+      shortestLinks.push(link);
+    }
+  }
+
+  for (var i = 0; i < linkStrings.length; i++) {
+    for (var j = 0; j < shortestLinks.length; j++) {
+      if (shortestLinks[j].innerText.toLowerCase().indexOf(linkStrings[i]) !== -1) {
+        domUtils.simulateClick(shortestLinks[j]);
         // blur the element just in case it already has focus. then when we re-focus it, the browser will
         // scroll such that it is visible.
-        link.blur();
-        link.focus();
+        shortestLinks[j].blur();
+        shortestLinks[j].focus();
         return true;
       }
     }
