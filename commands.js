@@ -144,7 +144,8 @@ function clearKeyMappingsAndSetDefaults() {
     "b": "activateBookmarkFindMode",
     "B": "activateBookmarkFindModeToOpenInNewTab",
 
-    "gf": "nextFrame"
+    "gf": "nextFrame",
+    "gv": "externalEditor"
   };
 
   for (var key in defaultKeyMappings)
@@ -180,6 +181,7 @@ var commandDescriptions = {
   enterInsertMode: ["Enter insert mode"],
 
   focusInput: ["Focus the first (or n-th) text box on the page", { passCountToFunction: true }],
+  externalEditor: ["Loads external editor", {passCountToFunction: true}],
 
   'linkHints.activateMode': ["Open a link in the current tab"],
   'linkHints.activateModeToOpenInNewTab': ["Open a link in a new tab"],
@@ -237,7 +239,7 @@ var commandGroups = {
   tabManipulation:
     ["nextTab", "previousTab", "firstTab", "lastTab", "createTab", "removeTab", "restoreTab"],
   misc:
-    ["showHelp"]
+    ["showHelp", "externalEditor"]
 };
 
 // Rarely used commands are not shown by default in the help dialog or in the README. The goal is to present

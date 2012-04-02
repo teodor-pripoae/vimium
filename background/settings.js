@@ -6,6 +6,7 @@ var settings = {
   defaults: {
     scrollStepSize: 60,
     linkHintCharacters: "sadfjklewcmpgh",
+    externalEditor: "gvim -f",
     filterLinkHints: false,
     hideHud: false,
     userDefinedLinkHintCss:

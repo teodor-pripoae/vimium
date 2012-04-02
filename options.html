@@ -89,7 +89,7 @@
   $ = function(id) { return document.getElementById(id); };
   var bgSettings = chrome.extension.getBackgroundPage().settings;
 
-  var editableFields = ["scrollStepSize", "excludedUrls", "linkHintCharacters", "userDefinedLinkHintCss",
+  var editableFields = ["scrollStepSize", "excludedUrls", "linkHintCharacters", "externalEditor", "userDefinedLinkHintCss",
                         "keyMappings", "filterLinkHints", "previousPatterns", "nextPatterns", "hideHud"];
 
   var canBeEmptyFields = ["excludedUrls", "keyMappings", "userDefinedLinkHintCss"];
@@ -255,6 +255,17 @@
               </div>
             </div>
             <input id="linkHintCharacters" type="text" style="width:150px" />
+        </td>
+      </tr>
+      <tr class="advancedOption">
+        <td class="caption">External editor</td>
+        <td verticalAlign="top">
+            <div class="help">
+              <div class="example">
+                External editor to be launched when typing "gv in command mode
+              </div>
+            </div>
+            <input id="externalEditor" type="text" style="width:150px" />
         </td>
       </tr>
       <tr class="advancedOption">

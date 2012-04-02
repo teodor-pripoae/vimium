@@ -38,6 +38,12 @@ var textInputXPath = (function() {
   return domUtils.makeXPath(inputElements);
 })();
 
+// The corresponding XPath only for textareas.
+var textAreaXPath = (function() {
+  return domUtils.makeXPath(["textarea"]);
+})();
+
+
 /**
  * settings provides a browser-global localStorage-backed dict. get() and set() are synchronous, but load()
  * must be called beforehand to ensure get() will return up-to-date values.
@@ -46,7 +52,7 @@ var settings = {
   port: null,
   values: {},
   loadedValues: 0,
-  valuesToLoad: ["scrollStepSize", "linkHintCharacters", "filterLinkHints", "hideHud", "previousPatterns",
+  valuesToLoad: ["scrollStepSize", "linkHintCharacters", "externalEditor", "filterLinkHints", "hideHud", "previousPatterns",
       "nextPatterns", "findModeRawQuery"],
   isLoaded: false,
   eventListeners: {},
@@ -312,8 +318,40 @@ function scrollFullPageDown() { scrollActivatedElementBy("y", window.innerHeight
 function scrollLeft() { scrollActivatedElementBy("x", -1 * settings.get("scrollStepSize")); }
 function scrollRight() { scrollActivatedElementBy("x", parseFloat(settings.get("scrollStepSize"))); }
 
-function focusInput(count) {
-  var results = domUtils.evaluateXPath(textInputXPath, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
+function externalEditor(count) {
+  count = count ? count : 1;
+  var tab = arguments[arguments.length-1];
+  var xhr = new XMLHttpRequest();
+  var url = 'http://127.0.0.1:23456';
+  var editor = settings.get("externalEditor");
+
+  xhr.open("POST", url, true);
+  xhr.onerror = function() {
+    // just editor name without arguments
+    var _ed = editor.split(' ')[0];
+    alert("Server not started, or "+_ed+" not found");
+  };
+
+  var current_input = focusInput(count, textAreaXPath);
+
+  xhr.onreadystatechange = function() {
+    if(xhr.readyState == 4 && xhr.status == 200) {
+      var response = xhr.responseText;
+      current_input.value = response;
+    }
+  };
+
+  xhr.setRequestHeader("Content-type", "text/plain");
+
+  var params = {content: current_input.value, editor: editor};
+  xhr.setRequestHeader('Content-Type','application/json');
+  xhr.setRequestHeader('Mime-Type','application/json');
+  xhr.send(JSON.stringify(params));
+}
+
+function focusInput(count, inputPath) {
+  var results = domUtils.evaluateXPath(inputPath || textInputXPath,
+                                       XPathResult.ORDERED_NODE_ITERATOR_TYPE);
 
   var lastInputBox;
   var i = 0;
@@ -331,6 +369,8 @@ function focusInput(count) {
   }
 
   if (lastInputBox) { lastInputBox.focus(); }
+
+  return lastInputBox;
 }
 
 function reload() { window.location.reload(); }
